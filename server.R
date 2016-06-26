@@ -4,6 +4,7 @@ df <- read.csv("data/Mesothelioma-data-set.csv", header = TRUE)
 # data splitting
 library(caret)
 library(kernlab)
+library(e1071)
 inTrain <- createDataPartition(y=df$class.of.diagnosis,
                               p=0.75, list=FALSE)
 training <- df[inTrain,]
@@ -68,10 +69,12 @@ shinyServer(
 	  # diagnostic plot
 	  output$newDiagPlot <- renderPlot({
 	    if(input$select==1) {
-	      plot(finalModel1,1,pch=19,cex=0.5,col="#00000010")
+	      plot(finalModel1,1,pch=19,cex=0.5,col="#00000010", 
+	           main="Symptom")
 	    }
 	    else {
-	      plot(finalModel2,1,pch=19,cex=0.5,col="#00000010")
+	      plot(finalModel2,1,pch=19,cex=0.5,col="#00000010", 
+	           main="Diagnostic Test")
 	    }
 	  })
 
