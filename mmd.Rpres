@@ -1,0 +1,97 @@
+Exploring ML Techniques for Diagnosis of Malignant Mesothelioma
+========================================================
+author: RM
+date: `r date()`
+autosize: true
+
+Overview
+========================================================
+
+Malignant mesothelioma (MM) is aggressive tumor of lungs, which results from exposure to mineral fibers. The objective in this presentation is to explore the MM hospital report data using machine learning techniques to target disease diagnosis.
+
+Introduction: select a subcategory of the data and fit a model with general linear model (GLM) technique.
+
+- Explore the data by symptom
+- Explore the data by diagnostic test
+
+Method & Associated Statistics
+========================================================
+
+Method General linear Model (GLM).
+
+```{r, echo=FALSE}
+# read data
+df <- read.csv("data/Mesothelioma-data-set.csv", header = TRUE)
+# data splitting
+library(caret)
+library(kernlab)
+inTrain <- createDataPartition(y=df$class.of.diagnosis,
+                              p=0.75, list=FALSE)
+training <- df[inTrain,]
+testing <- df[-inTrain,]
+# data set categories
+patient <- c("age","gender","city")
+medicalhistory <- c("asbestos.exposure","duration.of.asbestos.exposure",
+                    "duration.of.symptoms","habit.of.cigarette")
+symptom <- c("dyspnoea","ache.on.chest","weakness")
+diagnosis <- c("diagnosis.method","class.of.diagnosis","pleural.effusion",
+               "pleural.thickness.on.tomography")
+diagnostic <- c("white.blood","cell.count..WBC.","hemoglobin..HGB.",
+                "platelet.count..PLT.","sedimentation",
+				        "blood.lactic.dehydrogenise..LDH.","alkaline.phosphatise..ALP.",
+                "total.protein","albumin","glucose","pleural.lactic.dehydrogenise",
+                "pleural.protein","pleural.albumin","pleural.glucose",
+				        "pleural.level.of.acidity..pH.","C.reactive.protein..CRP.")
+target <- c("class.of.diagnosis")
+# only take columns of interest
+trainS <- training[,c(target,medicalhistory,symptom)]
+testS <- testing[,c(target,medicalhistory,symptom)]
+trainD <- training[,c(target,medicalhistory,diagnostic)]
+testD <- testing[,c(target,medicalhistory,diagnostic)]
+# fit a model trial one
+set.seed(32343)
+modelFit1 <- train(as.factor(class.of.diagnosis) ~.,data=trainS, method="glm")
+# final model one
+finalModel1 <- modelFit1$finalModel
+# prediction one
+predictions1 <- predict(modelFit1,newdata=testS)
+# confusion matrix one
+confMatrix1 <- confusionMatrix(predictions1,testS$class.of.diagnosis)
+# fit a model trail two
+set.seed(32743)
+modelFit2 <- train(as.factor(class.of.diagnosis) ~.,data=trainD, method="glm")
+# final model two
+finalModel2 <- modelFit2$finalModel
+# prediction two
+predictions2 <- predict(modelFit2,newdata=testD)
+# confusion matrix two
+confMatrix2 <- confusionMatrix(predictions2,testD$class.of.diagnosis) 
+confMatrix1
+confMatrix2
+```
+
+Results & Plots
+========================================================
+
+Results predicted values versus residuals.
+
+```{r, echo=FALSE}
+plot(finalModel1,1,pch=19,cex=0.5,col="#00000010",main="Symptom") 
+plot(finalModel2,1,pch=19,cex=0.5,col="#00000010",main="Diagnostic Test") 
+```
+
+Conclusion
+========================================================
+
+Conclusion: the results of this presentation demonstrate an exploration of differences between two examples of subsets of data.  
+
+- Selection by symptom
+- Selection by diagnostic test
+
+Reference
+
+An approach based on probabilistic neural network for diagnosis of Mesothelioma's disease 
+By: Er, Orhan; Tanrikulu, Abdullah Cetin; Abakay, Abdurrahman; et al. 
+COMPUTERS & ELECTRICAL ENGINEERING Volume: 38 Issue: 1 Pages: 75-81 Published: JAN 2012 
+
+
